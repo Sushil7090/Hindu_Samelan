@@ -1,12 +1,20 @@
 const app = require("./app");
 const sequelize = require("./config/db");
-const User = require("../database/models/user"); // correct path from src/container.js
+const User = require("../database/models/user");
 
 const PORT = process.env.PORT || 4000;
 
-sequelize.sync({ alter: true }) // create tables if not exist
+// FIRST: Server start kara (Renderला port detect hoil)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// THEN: Database sync kara (background madhye)
+sequelize.sync({ alter: true })
   .then(() => {
-    console.log("Database & tables created!");
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    console.log("✅ Database & tables created!");
   })
-  .catch(err => console.error("Error creating tables:", err));
+  .catch(err => {
+    console.error("❌ Error creating tables:", err);
+    // Server chalu rahil even if DB fails
+  });
